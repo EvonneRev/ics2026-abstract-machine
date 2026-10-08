@@ -8,6 +8,11 @@ Context* __am_irq_handle(Context *c) {
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
+      case 11:
+      if (c->GPR1 == -1) ev.event = EVENT_YIELD;   // yield() 往 a7 里放了 -1
+        else               ev.event = EVENT_SYSCALL; // PA3.2 会用到
+        c->mepc += 4;   // 跳过 ecall，否则返回后会反复触发
+        break;
       default: ev.event = EVENT_ERROR; break;
     }
 
